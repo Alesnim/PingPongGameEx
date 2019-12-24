@@ -2,10 +2,9 @@ package com.itschool;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Ellipse2D;
 
 public class Main {
 
@@ -27,6 +26,8 @@ class MyPanel extends JPanel {
 
     int dx =1;
     int dy = 1;
+    Ellipse2D shar;
+    Rectangle platform;
 
     static final int xPl = 30;
     int yPl = 50;
@@ -34,17 +35,16 @@ class MyPanel extends JPanel {
     Timer timerFrame;
 
 
+
+
     public MyPanel(){
         this.setFocusable(true);
-        timerFrame = new Timer(10, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                repaint();
-            }
-        });
+        timerFrame = new Timer(10, e -> repaint());
         timerFrame.start();
 
         addKeyListener(new MyListener());
+
+
     }
 
     @Override
@@ -52,26 +52,45 @@ class MyPanel extends JPanel {
         super.paintComponent(g);
 
         Graphics2D graphics2D = (Graphics2D) g;
+        shar = new Ellipse2D.Double(x,y, 30,30);
+        platform = new Rectangle(xPl,yPl,20,40);
         moveShar(x, y);
         x+= dx;
         y+=dy;
 
-
-        graphics2D.fillOval(x, y, 30,30);
-        graphics2D.fillRect(xPl, yPl, 20,40);
+        graphics2D.draw(shar);
+        graphics2D.fill(shar);
+        graphics2D.draw(platform);
+        graphics2D.fill(platform);
+        /*graphics2D.fillOval(x,y, 30,30);
+        graphics2D.fillRect(xPl,yPl,20,40);*/
     }
 
 
-    private void moveShar(int x, int y ){
+    private void moveShar(int x, int y){
         if (x == 400-60) {
             dx = -1;
         }
+        if (shar.intersects(platform)) {
+            if ( shar.getMinY() < platform.getCenterY()) {
+                dx = 1;
+                dy = 1;
+
+            }
+            if (shar.getMaxY() > platform.getCenterY()){
+                dx = 1;
+                dy = -1;
+            }
+        }
+
+
+
 
         if (x == 0){
             dx =1;
         }
 
-        if (y == 400-60){
+        if (y == 400-70){
             dy = -1;
         }
 
